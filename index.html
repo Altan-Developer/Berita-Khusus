@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berita Hari Ini!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+    }
+    body {
+      background: linear-gradient(to bottom, #ec407a, #fdd835, #ffffff);
+      color: black;
+      overflow-x: hidden;
+      transition: background 0.6s ease;
+    }
+    .section {
+      padding: 4rem 2rem;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s ease;
+    }
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .center-img {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .center-img img {
+      width: 300px;
+      height: 200px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      transition: transform 0.6s ease;
+    }
+    .center-img img:hover {
+      transform: scale(1.05);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .desc {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .chat-box {
+      margin: 3rem auto;
+      max-width: 700px;
+      background: rgba(255,255,255,0.4);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .chat-box h3 {
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .chat-box textarea {
+      width: 100%;
+      height: 100px;
+      padding: 1rem;
+      border-radius: 10px;
+      border: none;
+      resize: none;
+      font-weight: bold;
+    }
+    #comments {
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+    }
+    .comment {
+      background: rgba(0,0,0,0.2);
+      padding: 0.5rem;
+      border-radius: 6px;
+      color: black;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <section id="forum" class="section">
+    <div class="center-img"><img src="berita1.jpg" alt="Berita 1"></div>
+    <h1>Gak Ada Berita Ges Maap Ya</h1>
+    <p class="desc">Selamat Datang Di Berita Khusus!</p>
+    <div class="chat-box">
+      <h3>Ini Adalah Situs Web Berita Khusus Di rancang Oleh Altan!</h3>
+      <textarea placeholder="Komentar Anda sebagai Netijen +62"></textarea>
+      <div id="comments"></div>
+    </div>
+  </section>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script>
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    });
+    document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+    var firebaseConfig = {
+      apiKey: "AIzaSyA2TBDAI7AseqZSMnVgyBuqbKhmqnjsPRU",
+      authDomain: "altan-forum.firebaseapp.com",
+      databaseURL: "https://altan-forum-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "altan-forum",
+      storageBucket: "altan-forum.appspot.com",
+      messagingSenderId: "490273623604",
+      appId: "1:490273623604:web:93c774600c5d13a3240461"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+
+    const commentBox = document.querySelector('textarea');
+    const commentList = document.getElementById('comments');
+
+    commentBox.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const isi = commentBox.value.trim();
+        if (isi !== "") {
+          db.ref("komentar").push({ text: isi });
+          commentBox.value = "";
+        }
+      }
+    });
+
+    db.ref("komentar").on('child_added', function(snapshot) {
+      const data = snapshot.val();
+      const div = document.createElement('div');
+      div.className = 'comment';
+      div.textContent = "Netijen +62: " + data.text;
+      commentList.prepend(div);
+    });
+  </script>
+</body>
+</html>
